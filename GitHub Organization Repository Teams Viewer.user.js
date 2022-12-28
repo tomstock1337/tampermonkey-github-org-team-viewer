@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub Organization Repository Teams Viewer
 // @namespace    http://www.thomasstockwell.com/
-// @version      0.4
+// @version      0.5
 // @description  try to take over the world!
 // @author       Thomas Stockwell
 // @match        https://github.com/**
@@ -26,36 +26,42 @@
 	var pageURLArray;
 	var org;
 
-	// listen for changes
+    // See if page that loaded requires repository changes
+    validatePage();
+
+	// Listen for changes to the URL
 	setInterval(function()
 							{
-			if (pageURL != location.href)
-			{
-					// page has changed, set new page as 'current'
-					pageURL = location.href;
-					if (pageURL.match(pageRepoRegex)){
-							pageURLArray = pageRepoRegex.exec(pageURL);
-							//[0] = https://github.com/orgs/orgname/repositories
-							//[1] = https://github.com/orgs/
-							//[2] = www.
-							//[3] = orgname
-							org = pageURLArray[3];
-							addRepoTeams(org);
-					}
-					else if (pageURL.match(pageOrgProfileRegex)) {
-							var orgRepos = $('div#org-profile-repositories');
-							if(orgRepos.length>0){
-									pageURLArray = pageOrgProfileRegex.exec(pageURL);
-									//[0] = https://github.com/orgname
-                                    //[1] = https://github.com/
-									//[2] = www.
-									//[3] = orgname
-									org = pageURLArray[3];
-									addRepoTeams(org);
-							}
-					}
-			}
+        if (pageURL != location.href){
+            pageURL = location.href;
+            validatePage();
+        }
 	}, 500);
+
+    function validatePage(){
+        // page has changed, set new page as 'current'
+        if (pageURL.match(pageRepoRegex)){
+            pageURLArray = pageRepoRegex.exec(pageURL);
+            //[0] = https://github.com/orgs/orgname/repositories
+            //[1] = https://github.com/orgs/
+            //[2] = www.
+            //[3] = orgname
+            org = pageURLArray[3];
+            addRepoTeams(org);
+        }
+        else if (pageURL.match(pageOrgProfileRegex)) {
+            var orgRepos = $('div#org-profile-repositories');
+            if(orgRepos.length>0){
+                pageURLArray = pageOrgProfileRegex.exec(pageURL);
+                //[0] = https://github.com/orgname
+                //[1] = https://github.com/
+                //[2] = www.
+                //[3] = orgname
+                org = pageURLArray[3];
+                addRepoTeams(org);
+            }
+        }
+    };
 
 	function addRepoTeams(org){
 			var colors=["#F73F0C","#B50BD4","#003BEB","#0BD48F","#93F500"];
