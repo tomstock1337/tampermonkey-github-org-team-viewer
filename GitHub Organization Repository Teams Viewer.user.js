@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         GitHub Organization Repository Teams Viewer
 // @namespace    http://www.thomasstockwell.com/
-// @version      0.2
+// @version      0.3
 // @description  try to take over the world!
 // @author       Thomas Stockwell
-// @include        /(https?:\/\/(www\.)?github\.com\/orgs\/)([^\/]*)\/repositories\/?/
+// @match        https://github.com/**
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @require  https://gist.github.com/raw/2625891/waitForKeyElements.js
 // @downloadURL  https://github.com/tomstock1337/tampermonkey-github-org-team-viewer/raw/main/GitHub%20Organization%20Repository%20Teams%20Viewer.user.js
 // @updateURL    https://github.com/tomstock1337/tampermonkey-github-org-team-viewer/raw/main/GitHub%20Organization%20Repository%20Teams%20Viewer.user.js
 // @grant        GM_xmlhttpRequest
@@ -20,9 +21,24 @@
     const urlOrgsBase = "https://www.github.com/orgs/";
     const urlGitHubBase = "https://www.github.com";
     const pill = '<span class="label v-align-middle" style="border-color:{color};color:white">{pilltext}</span>';
+    var pageURL = window.location.href;
+
+    // listen for changes
+    setInterval(function()
+                {
+        if (pageURL != location.href)
+        {
+            // page has changed, set new page as 'current'
+            pageURL = location.href;
+            if (pageURL.match(pageRegex)){
+                addRepoTeams();
+            }
+        }
+    }, 500);
+
+    function addRepoTeams(){
     var colors=["#F73F0C","#B50BD4","#003BEB","#0BD48F","#93F500"];
     var debug = true;
-    var pageURL = window.location.href;
     var pageURLArray = pageRegex.exec(pageURL);
     //[0] = https://github.com/orgs/umd-its/repositories
     //[1] = https://github.com/orgs/
@@ -118,8 +134,8 @@
             stage3Start();
         }
     }
-
     stage2start();
-
+};
 
 })();
+
